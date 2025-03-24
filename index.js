@@ -11,38 +11,42 @@ if (!tasksInStorage) {
 setTasksFromLocalStorage();
 
 function setTasksFromLocalStorage() {
-    if (tasksInStorage === "")
-        return;
 
-    tasksInStorage.split(",").forEach((taskFromStorage) => {
-        const task = document.createElement("div");
-        task.classList.add("task");
-        
-        const taskNameElem = document.createElement("span");
-        taskNameElem.classList.add("task-name");
-        
-        const markerElem = document.createElement("span");
-        markerElem.textContent = "◯";
-        taskNameElem.appendChild(markerElem);
-        
-        const taskName = document.createElement("span");
-        taskName.textContent = taskFromStorage.trim();
-        taskNameElem.appendChild(taskName);
-        task.appendChild(taskNameElem);
+    if (tasksInStorage !== "") {
+        const taskPlaceholder = document.querySelector(".no-tasks-available");
+        if (taskPlaceholder)
+            taskPlaceholder.parentElement.removeChild(taskPlaceholder);
 
-        const deleteTaskBtn = document.createElement("button");
-        deleteTaskBtn.classList.add("delete-task");
+        tasksInStorage.split(",").forEach((taskFromStorage) => {
+            const task = document.createElement("div");
+            task.classList.add("task");
+            
+            const taskNameElem = document.createElement("span");
+            taskNameElem.classList.add("task-name");
+            
+            const markerElem = document.createElement("span");
+            markerElem.textContent = "◯";
+            taskNameElem.appendChild(markerElem);
+            
+            const taskName = document.createElement("span");
+            taskName.textContent = taskFromStorage.trim();
+            taskNameElem.appendChild(taskName);
+            task.appendChild(taskNameElem);
 
-        const deleteImg = document.createElement("img");
-        deleteImg.setAttribute("src", "img/delete-icon.svg");
-        deleteImg.setAttribute("alt", "Delete");
-        deleteTaskBtn.appendChild(deleteImg);
+            const deleteTaskBtn = document.createElement("button");
+            deleteTaskBtn.classList.add("delete-task");
 
-        task.appendChild(deleteTaskBtn);
+            const deleteImg = document.createElement("img");
+            deleteImg.setAttribute("src", "img/delete-icon.svg");
+            deleteImg.setAttribute("alt", "Delete");
+            deleteTaskBtn.appendChild(deleteImg);
 
-        taskList.appendChild(task);
-    }); 
-}
+            task.appendChild(deleteTaskBtn);
+
+            taskList.appendChild(task);
+        });
+    }
+};
 
 taskInput.addEventListener("keyup", () => {
     if (taskInput.value.trim() !== "") {
@@ -55,6 +59,11 @@ taskInput.addEventListener("keyup", () => {
 
 taskSubmitBtn.addEventListener("click", () => {
     if (taskInput.value.trim() !== "") {
+        
+        const taskPlaceholder = document.querySelector(".no-tasks-available");
+        if (taskPlaceholder)
+            taskPlaceholder.parentElement.removeChild(taskPlaceholder);
+
         const task = document.createElement("div");
         task.classList.add("task");
         
