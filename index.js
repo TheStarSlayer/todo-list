@@ -2,6 +2,7 @@ let tasksInStorage = localStorage.getItem("tasks");
 const taskInput = document.querySelector("#input-bar");
 const taskSubmitBtn = document.querySelector("#add-task");
 const taskList = document.querySelector(".task-list");
+const deleteTaskBtns = document.querySelectorAll(".delete-task");
 
 if (!tasksInStorage) {
     localStorage.setItem("tasks", "");
@@ -40,7 +41,7 @@ function setTasksFromLocalStorage() {
             deleteImg.setAttribute("src", "img/delete-icon.svg");
             deleteImg.setAttribute("alt", "Delete");
             deleteTaskBtn.appendChild(deleteImg);
-
+            addDeleteEvent(deleteTaskBtn);
             task.appendChild(deleteTaskBtn);
 
             taskList.appendChild(task);
@@ -86,7 +87,7 @@ taskSubmitBtn.addEventListener("click", () => {
         deleteImg.setAttribute("src", "img/delete-icon.svg");
         deleteImg.setAttribute("alt", "Delete");
         deleteTaskBtn.appendChild(deleteImg);
-
+        addDeleteEvent(deleteTaskBtn);
         task.appendChild(deleteTaskBtn);
 
         taskList.appendChild(task);
@@ -102,3 +103,43 @@ taskSubmitBtn.addEventListener("click", () => {
         taskSubmitBtn.setAttribute("disabled", true);
     }
 });
+
+deleteTaskBtns.forEach((btn) => {
+    addDeleteEvent(btn);
+});
+
+function addDeleteEvent(btn) {
+    btn.addEventListener("click", () => {
+        let taskNameToDelete = btn.previousSibling.childNodes[1].textContent.trim();
+        const taskToDelete = btn.parentNode;
+        taskToDelete.parentNode.removeChild(taskToDelete);
+        let allTasks = tasksInStorage.split(",");
+        allTasks = allTasks.filter((taskName) => taskName !== taskNameToDelete);
+        tasksInStorage = allTasks.join(",");
+        
+        if (tasksInStorage === "") {
+            addPlaceholderTask();
+        }
+
+        localStorage.setItem("tasks", tasksInStorage);
+    });
+}
+
+function addPlaceholderTask() {
+    const task = document.createElement("div");
+    task.classList.add("task");
+    task.classList.add("no-tasks-available");
+    
+    const taskNameElem = document.createElement("span");
+    taskNameElem.classList.add("task-name");
+    
+    const markerElem = document.createElement("span");
+    markerElem.textContent = "◯";
+    taskNameElem.appendChild(markerElem);
+    
+    const taskName = document.createElement("span");
+    taskName.textContent = "Add a task to see it here!";
+    taskNameElem.appendChild(taskName);
+    task.appendChild(taskNameElem);
+    taskList.appendChild(task);
+}
