@@ -1,0 +1,124 @@
+body {
+    margin: none;
+    padding: none;
+    background-color: black;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3em;
+    height: 100vh;
+    width: 100vw;
+    font-family: Montserrat, Arial, Helvetica, sans-serif;
+}
+
+#heading {
+    font-size: 60px;
+    font-weight: bolder;
+    padding: 0.5em;
+}
+
+#styled-heading {
+    background-color: white;
+    color: black;
+    padding: 20px;
+}
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    width: 100vw;
+    padding-left: 20px;
+}
+
+.task {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-size: 24px;
+    font-weight: bold;
+    border: 2px solid white;
+    width: 80%;
+    border-radius: 8px;
+    transition: padding 0.15s;
+    font-family: Quicksand, Arial, Helvetica, sans-serif;
+}
+
+.task-name {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: baseline;
+    padding: 20px;
+}
+
+.delete-task {
+    width: 8%;
+    background-color: black;
+    outline: none;
+    border-radius: 8px;
+    border: none;
+    color: white;
+    transition: background-color 0.15s;
+}
+
+.delete-task:hover {
+    background-color: red;
+}
+
+.task button img {
+    height: 3em;
+    width: 3    em;
+}
+
+.task-input {
+    justify-self: bottom;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 20px;
+    margin-top: auto;
+    width: 100vw;
+}
+
+#input-bar {
+    padding: 20px;
+    font-size: 16px;
+    width: 60%;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    transition: box-shadow 0.25s;
+    background-color: rgba(33,33,33,.9);
+}
+
+#input-bar:focus {
+    box-shadow: 0px 0px 20px 1px rgb(22, 117, 22);
+    outline: none;
+}
+
+#add-task {
+    width: 10%;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    background-color: rgb(7, 69, 37);
+    transition: background-color 0.5s;
+    cursor: pointer;
+}
+
+#add-task:hover {
+    background-color: rgb(22, 117, 22);
+}
+
+#add-task:disabled {
+    background-color: rgb(35, 47, 31);
+    cursor: not-allowed;
+    color: grey;
+}
+
+#input-bar,
+#add-task {
+    color: white;
+    border: none;
+}

@@ -4,17 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-do list</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Quicksand:wght@300..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
     <span id="heading">
         To-Do <span id="styled-heading">List</span>
     </span>
 
-    <div class="task-list"></div>
+    <div class="task-list">
+        <div class="task">
+            
+            <span class="task-name">
+                <span class="marker">◯</span>
+                Test task!!!
+            </span>
+            <button class="delete-task">
+                <!-- Delete -->
+                <img src="img/delete-icon.svg" alt="Delete">
+            </button>
+        </div>
+    </div>
 
     <div class="task-input">
-        <input id="input-bar" type="text">
-        <button id="add-task">Add task</button>
+        <input id="input-bar" type="text" placeholder="Enter a task....">
+        <button id="add-task" disabled>Add task</button>
     </div>
 
     <script src="index.js"></script>
