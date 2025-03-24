@@ -46,6 +46,12 @@ body {
     font-family: Quicksand, Arial, Helvetica, sans-serif;
 }
 
+.no-tasks-available {
+    color: grey;
+    border-color: grey;
+    border-width: 1px;
+}
+
 .task-name {
     display: flex;
     flex-direction: row;
