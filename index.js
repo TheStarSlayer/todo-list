@@ -44,11 +44,16 @@ taskSubmitBtn.addEventListener("click", () => {
 
 function addDeleteEvent(btn) {
     btn.addEventListener("click", () => {
-        let taskNameToDelete = btn.previousSibling.childNodes[1].textContent.trim();
+        let taskNoToDelete = btn.parentNode.getAttribute("taskNo");
         const taskToDelete = btn.parentNode;
         taskToDelete.parentNode.removeChild(taskToDelete);
         let allTasks = tasksInStorage.split(",");
-        allTasks = allTasks.filter((taskName) => taskName !== taskNameToDelete);
+        allTasks.splice(taskNoToDelete, 1);
+
+        for (let i = 0; i < taskList.childElementCount; i++) {
+            taskList.children[i].setAttribute("taskNo",  i);
+        }
+
         tasksInStorage = allTasks.join(",");
         
         if (tasksInStorage === "") {
@@ -64,9 +69,11 @@ function setTasksFromLocalStorage() {
         const taskPlaceholder = document.querySelector(".no-tasks-available");
         if (taskPlaceholder)
             taskPlaceholder.parentElement.removeChild(taskPlaceholder);
-
+        
+        let i = 0;
         tasksInStorage.split(",").forEach((taskFromStorage) => {
-            addTask(taskFromStorage);
+            addTask(taskFromStorage, i);
+            i++;
         });
     }
 };
@@ -77,8 +84,8 @@ function addPlaceholderTask() {
     taskList.appendChild(task);
 }
 
-function addTask(taskNameToAdd) {
-    const task = addTaskName(taskNameToAdd);
+function addTask(taskNameToAdd, taskNo = -1) {
+    const task = addTaskName(taskNameToAdd, taskNo);
 
     const deleteTaskBtn = document.createElement("button");
     deleteTaskBtn.classList.add("delete-task");
@@ -93,9 +100,18 @@ function addTask(taskNameToAdd) {
     taskList.appendChild(task);
 }
 
-function addTaskName(taskNameToAdd) {
+function addTaskName(taskNameToAdd, taskNo = -1) {
     const task = document.createElement("div");
     task.classList.add("task");
+
+    if (taskNo > -1)
+        task.setAttribute("taskNo", taskNo);
+    else {
+        if (tasksInStorage === "")
+            task.setAttribute("taskNo", 0);
+        else
+            task.setAttribute("taskNo", tasksInStorage.split(",").length);
+    }
     
     const taskNameElem = document.createElement("span");
     taskNameElem.classList.add("task-name");
