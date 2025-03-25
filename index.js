@@ -5,6 +5,8 @@ const taskList = document.querySelector(".task-list");
 const deleteTaskBtns = document.querySelectorAll(".delete-task");
 const TASK_PLACEHOLDER = "Add a task to see it here!";
 
+let taskNumber = 0;
+
 if (!tasksInStorage) {
     localStorage.setItem("tasks", "");
     tasksInStorage = "";
@@ -28,7 +30,8 @@ taskSubmitBtn.addEventListener("click", () => {
         if (taskPlaceholder)
             taskPlaceholder.parentElement.removeChild(taskPlaceholder);
 
-        addTask(taskInput.value);
+        addTask(taskInput.value, taskNumber);
+        taskNumber++;
         
         if (tasksInStorage === "")
             tasksInStorage += taskInput.value.trim();
@@ -44,15 +47,19 @@ taskSubmitBtn.addEventListener("click", () => {
 
 function addDeleteEvent(btn) {
     btn.addEventListener("click", () => {
-        let taskNoToDelete = btn.parentNode.getAttribute("taskNo");
-        const taskToDelete = btn.parentNode;
+        let taskNoToDelete = parseInt(btn.parentNode.getAttribute("taskno"));
+        const allDOMTasks = document.querySelectorAll(".task");
+
+        for (let i = taskNoToDelete + 1; i < taskNumber; i++) {
+            allDOMTasks[i].setAttribute("taskno", i-1);
+        }
+
+        const taskToDelete = allDOMTasks[taskNoToDelete];
         taskToDelete.parentNode.removeChild(taskToDelete);
+
         let allTasks = tasksInStorage.split(",");
         allTasks.splice(taskNoToDelete, 1);
-
-        for (let i = 0; i < taskList.childElementCount; i++) {
-            taskList.children[i].setAttribute("taskNo",  i);
-        }
+        taskNumber--;
 
         tasksInStorage = allTasks.join(",");
         
@@ -70,10 +77,9 @@ function setTasksFromLocalStorage() {
         if (taskPlaceholder)
             taskPlaceholder.parentElement.removeChild(taskPlaceholder);
         
-        let i = 0;
         tasksInStorage.split(",").forEach((taskFromStorage) => {
-            addTask(taskFromStorage, i);
-            i++;
+            addTask(taskFromStorage, taskNumber);
+            taskNumber++;
         });
     }
 };
@@ -105,12 +111,12 @@ function addTaskName(taskNameToAdd, taskNo = -1) {
     task.classList.add("task");
 
     if (taskNo > -1)
-        task.setAttribute("taskNo", taskNo);
+        task.setAttribute("taskno", taskNo);
     else {
         if (tasksInStorage === "")
-            task.setAttribute("taskNo", 0);
+            task.setAttribute("taskno", 0);
         else
-            task.setAttribute("taskNo", tasksInStorage.split(",").length);
+            task.setAttribute("taskno", tasksInStorage.split(",").length);
     }
     
     const taskNameElem = document.createElement("span");
