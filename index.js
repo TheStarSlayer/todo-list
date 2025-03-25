@@ -1,4 +1,3 @@
-let tasksInStorage = localStorage.getItem("tasks");
 const taskInput = document.querySelector("#input-bar");
 const taskSubmitBtn = document.querySelector("#add-task");
 const taskList = document.querySelector(".task-list");
@@ -6,11 +5,6 @@ const deleteTaskBtns = document.querySelectorAll(".delete-task");
 const TASK_PLACEHOLDER = "Add a task to see it here!";
 
 let taskNumber = 0;
-
-if (!tasksInStorage) {
-    localStorage.setItem("tasks", "");
-    tasksInStorage = "";
-}
 
 setTasksFromLocalStorage();
 
@@ -30,6 +24,20 @@ taskSubmitBtn.addEventListener("click", () => {
         if (taskPlaceholder)
             taskPlaceholder.parentElement.removeChild(taskPlaceholder);
 
+        let date = getStringDate();
+        let localStorageKey = "tasks_" + date;
+        
+        let tasksInStorage = localStorage.getItem(localStorageKey);
+
+        if (!tasksInStorage) {
+            localStorage.setItem(localStorageKey, "");
+            tasksInStorage = localStorage.getItem(localStorageKey);
+        }
+            
+        if (tasksInStorage === "") {
+            createDateMark(date);
+        }
+
         addTask(taskInput.value, taskNumber);
         taskNumber++;
         
@@ -38,7 +46,7 @@ taskSubmitBtn.addEventListener("click", () => {
         else
             tasksInStorage += "," + taskInput.value.trim();
 
-        localStorage.setItem("tasks", tasksInStorage);
+        localStorage.setItem(localStorageKey, tasksInStorage);
 
         taskInput.value = "";
         taskSubmitBtn.setAttribute("disabled", true);
@@ -55,33 +63,67 @@ function addDeleteEvent(btn) {
         }
 
         const taskToDelete = allDOMTasks[taskNoToDelete];
-        taskToDelete.parentNode.removeChild(taskToDelete);
+        const date = taskToDelete.getAttribute("datemark");
+        
+        let localStorageKey = "tasks_" + date;
+        let tasksInStorage = localStorage.getItem(localStorageKey);
 
         let allTasks = tasksInStorage.split(",");
         allTasks.splice(taskNoToDelete, 1);
-        taskNumber--;
-
         tasksInStorage = allTasks.join(",");
         
         if (tasksInStorage === "") {
-            addPlaceholderTask();
+            const datemarkToDelete = taskToDelete.previousElementSibling; 
+            datemarkToDelete.parentNode.removeChild(datemarkToDelete)
         }
 
-        localStorage.setItem("tasks", tasksInStorage);
+        taskNumber--;
+        taskToDelete.parentNode.removeChild(taskToDelete);
+
+        if (document.querySelectorAll(".task").length === 0)
+            addPlaceholderTask();
+
+        localStorage.setItem(localStorageKey, tasksInStorage);
     });
 }
 
 function setTasksFromLocalStorage() {
-    if (tasksInStorage !== "") {
-        const taskPlaceholder = document.querySelector(".no-tasks-available");
-        if (taskPlaceholder)
-            taskPlaceholder.parentElement.removeChild(taskPlaceholder);
-        
-        tasksInStorage.split(",").forEach((taskFromStorage) => {
-            addTask(taskFromStorage, taskNumber);
-            taskNumber++;
-        });
+
+    let localStorageKeys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        if (localStorage.key(i).startsWith("tasks_")) {
+            localStorageKeys.push(localStorage.key(i));
+        }
     }
+
+    localStorageKeys.sort((a, b) => {
+        a = a.split("tasks_")[1];
+        b = b.split("tasks_")[1];
+        const aTime = a.split("-");
+        const bTime = b.split("-");
+
+        if (aTime[0] !== bTime[0])
+            return parseInt(aTime[0]) - parseInt(bTime[0]);
+        if (aTime[1] !== bTime[1])
+            return parseInt(aTime[0]) - parseInt(bTime[0]);
+        return parseInt(aTime[2]) - parseInt(bTime[2]);
+    });
+
+    localStorageKeys.forEach((date) => {
+        tasksInStorage = localStorage.getItem(date);
+        if (tasksInStorage !== "") {
+            createDateMark(date.split("tasks_")[1]);
+            const taskPlaceholder = document.querySelector(".no-tasks-available");
+            if (taskPlaceholder)
+                taskPlaceholder.parentElement.removeChild(taskPlaceholder);
+            
+            tasksInStorage.split(",").forEach((taskFromStorage) => {
+                addTask(taskFromStorage, taskNumber);
+                taskNumber++;
+            });
+        }
+    });
+
 };
 
 function addPlaceholderTask() {
@@ -90,7 +132,17 @@ function addPlaceholderTask() {
     taskList.appendChild(task);
 }
 
-function addTask(taskNameToAdd, taskNo = -1) {
+function createDateMark(date) {
+    const datemark = document.createElement("div");
+    datemark.classList.add("datemark");
+    const dateText = document.createElement("span");
+    dateText.textContent = "Added on: " + date;
+    datemark.appendChild(dateText);
+    datemark.appendChild(document.createElement("hr"));
+    taskList.appendChild(datemark);
+}
+
+function addTask(taskNameToAdd, taskNo = 0) {
     const task = addTaskName(taskNameToAdd, taskNo);
 
     const deleteTaskBtn = document.createElement("button");
@@ -106,18 +158,12 @@ function addTask(taskNameToAdd, taskNo = -1) {
     taskList.appendChild(task);
 }
 
-function addTaskName(taskNameToAdd, taskNo = -1) {
+function addTaskName(taskNameToAdd, taskNo = 0) {
     const task = document.createElement("div");
     task.classList.add("task");
 
-    if (taskNo > -1)
-        task.setAttribute("taskno", taskNo);
-    else {
-        if (tasksInStorage === "")
-            task.setAttribute("taskno", 0);
-        else
-            task.setAttribute("taskno", tasksInStorage.split(",").length);
-    }
+    task.setAttribute("taskno", taskNo);
+    task.setAttribute("datemark", getStringDate());
     
     const taskNameElem = document.createElement("span");
     taskNameElem.classList.add("task-name");
@@ -131,4 +177,9 @@ function addTaskName(taskNameToAdd, taskNo = -1) {
     taskNameElem.appendChild(taskName);
     task.appendChild(taskNameElem);
     return task;
+}
+
+function getStringDate() {
+    const date = new Date();
+    return String(date.getFullYear()) + "-" + String(date.getMonth() + 1) + "-" + String(date.getDate());
 }
