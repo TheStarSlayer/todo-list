@@ -58,19 +58,21 @@ function addDeleteEvent(btn) {
         let taskNoToDelete = parseInt(btn.parentNode.getAttribute("taskno"));
         const allDOMTasks = document.querySelectorAll(".task");
 
-        for (let i = taskNoToDelete + 1; i < taskNumber; i++) {
-            allDOMTasks[i].setAttribute("taskno", i-1);
-        }
-
         const taskToDelete = allDOMTasks[taskNoToDelete];
         const date = taskToDelete.getAttribute("datemark");
         
         let localStorageKey = "tasks_" + date;
         let tasksInStorage = localStorage.getItem(localStorageKey);
 
+        const taskToDeleteInStorage = findIndexInLocalStorage(taskNoToDelete);
+
         let allTasks = tasksInStorage.split(",");
-        allTasks.splice(taskNoToDelete, 1);
+        allTasks.splice(taskToDeleteInStorage, 1); // tasknotodelete is the index of all tasks; not in lcalstorage
         tasksInStorage = allTasks.join(",");
+
+        for (let i = taskNoToDelete + 1; i < taskNumber; i++) {
+            allDOMTasks[i].setAttribute("taskno", i-1);
+        }
         
         if (tasksInStorage === "") {
             const datemarkToDelete = taskToDelete.previousElementSibling; 
@@ -118,7 +120,7 @@ function setTasksFromLocalStorage() {
                 taskPlaceholder.parentElement.removeChild(taskPlaceholder);
             
             tasksInStorage.split(",").forEach((taskFromStorage) => {
-                addTask(taskFromStorage, taskNumber);
+                addTask(taskFromStorage, taskNumber, date.split("tasks_")[1]);
                 taskNumber++;
             });
         }
@@ -142,8 +144,8 @@ function createDateMark(date) {
     taskList.appendChild(datemark);
 }
 
-function addTask(taskNameToAdd, taskNo = 0) {
-    const task = addTaskName(taskNameToAdd, taskNo);
+function addTask(taskNameToAdd, taskNo = 0, date = getStringDate()) {
+    const task = addTaskName(taskNameToAdd, taskNo, date);
 
     const deleteTaskBtn = document.createElement("button");
     deleteTaskBtn.classList.add("delete-task");
@@ -158,12 +160,12 @@ function addTask(taskNameToAdd, taskNo = 0) {
     taskList.appendChild(task);
 }
 
-function addTaskName(taskNameToAdd, taskNo = 0) {
+function addTaskName(taskNameToAdd, taskNo = 0, date) {
     const task = document.createElement("div");
     task.classList.add("task");
 
     task.setAttribute("taskno", taskNo);
-    task.setAttribute("datemark", getStringDate());
+    task.setAttribute("datemark", date);
     
     const taskNameElem = document.createElement("span");
     taskNameElem.classList.add("task-name");
@@ -182,4 +184,24 @@ function addTaskName(taskNameToAdd, taskNo = 0) {
 function getStringDate() {
     const date = new Date();
     return String(date.getFullYear()) + "-" + String(date.getMonth() + 1) + "-" + String(date.getDate());
+}
+
+function findIndexInLocalStorage(taskNo) {
+    let tasksInStorage = [];
+    let totalLength = 0;
+    for (let i = 0; i < localStorage.length; i++) {
+        if (localStorage.key(i).startsWith("tasks_")) {
+            tasksInStorage = localStorage.getItem(localStorage.key(i));
+            if (tasksInStorage === "")
+                continue;
+            tasksInStorage = tasksInStorage.split(",");
+            for (let j = 0; j < tasksInStorage.length; j++) {
+                if (totalLength === taskNo) {
+                    return j;
+                }
+                totalLength++;
+            }
+        }
+    }
+    return -1;
 }
